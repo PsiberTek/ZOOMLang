@@ -17,9 +17,9 @@ hft(S, N) :- current_op(N,xfy,S).
 tfh(S, N) :- current_op(N,yfx,S).
 
 typs @ [
-  ! @ var, vald @ nonvar, str @ atom,
-  int @ integer, fl @ float, # @ number,
-  simp @ atomic, strukt @ compound].
+  @(!,var), @(vald,nonvar), @(str,atom),
+  @(int,integer), @(fl,float), @(#,number),
+  @(simp,atomic), @(strukt,compound)].
 
 typ(V) @ T :- typs  @TL, (
  TL@(_ @ T), [T,V];
@@ -37,7 +37,7 @@ kloz(:-(_,_)).
 
 rwl(R) :- atom(R); complex(R).
 
-func(_ @ _ !? _).
+func(!?(@(_,_),_)).
 
 
 trace(Goal) :- trace(0,Goal).
@@ -68,10 +68,11 @@ display_redo(Depth,Goal) :- true;
 
 
 ob @ {
-  vald @ Val ;
-  var !? var(Val) ;
-  :-(vald@Val, nonvar(Val)) ;
-  :-(eval@R, R = Val)
+  ;(@(vald,Val), ;(
+    !(var,var(Val)), ;(
+      ;(:-(@(vald,Val), nonvar(Val)), :-(@(eval,R), R = Val)
+    )
+  )
 }.
 
 ifkloz(X,H)@D :- X = (H :- D), D.
@@ -107,19 +108,19 @@ only_case(X,L) :- only_case(X,L)@R, R.
 ch_op(Char,Fix) :- case(Fix,(pre;suf;ht;th;fail)), Term=..[Fix|(Char|*)], Term.
 
 word(W) :- string(W),
-  not(member(W) @ M, (pass_char(M); char_signal(M); string_delimiter(M))).
+  not(@(member(W),M), (pass_char(M); char_signal(M); string_delimiter(M))).
 
 assoc(H,T) :- get(H) @ T , /; clear(H), set(H,T).
 
-simplify(S) @ R :- word(S), assoc(S)@R.
+simplify(S) @ R :- word(S), assoc(S) @ R.
 
-get(Term) @ R :- Term @ R; function(Term) @ R !? E), E
+get(Term) @ R :- Term @ R; !?(@(function(Term),R), E)), E
 
 clear(A) :- get(A) @ _, cons(A) @ X, delax(X).
 
 cons(X)@C :- C=..X,/; atom(X), C=X.
 
-set(X,V) :- addax(X @ V).
+set(X,V) :- addax(@(X,V)).
 
 remove_string_through(St,Char,Data)@R :-
   St=[Char|R], Data=nil;
